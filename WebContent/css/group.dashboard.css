@@ -1,0 +1,147 @@
+.btn-group.bootstrap-select { 
+	width: 100% !important;
+}
+.dropdown-menu.open {
+	position: fixed;
+	top: 170px;
+	left: 20px;
+}
+.btn-group-add, .btn-course-add, .btn-app-confirm {
+	float: right;
+	background-color: rgba(0,0,0,0);
+	color: rgba(0,0,0,0.6);
+	margin: 25px 0px 7px 0px;
+	border: none;
+	padding: 0px;
+}
+.btn-course-add {
+	margin: 0px 0px 7px 0px;
+}
+.btn-app-confirm {
+	margin: 10px 0px 7px 0px;
+}
+.btn-group-add:hover, .btn-course-add:hover, .btn-app-confirm:hover {
+	color: #000;
+	background-color: rgba(0,0,0,0);
+}
+.no-group {
+	text-align: center;
+	margin-top: 200px;
+	color: rgba(0,0,0,0.2);
+	font-weight: bold;
+}
+.btn-group-lg .glyphicon {
+	font-size: 30px;
+	padding-bottom: 5px;
+}
+.toolbar-text {
+	font-size: 12px;
+	padding-top: 5px;
+}
+.toolbox button {
+	border: none;
+}
+.toolbox button:hover {
+	border: none;
+	background-color: #FFF;
+	color: rgba(0,0,0,0.5);
+}
+#groupApps {
+	height: 30px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+#groupApps .list-group-item {
+	padding: 0px 5px 0px 10px;
+}
+.DTTT_container {
+	margin: 10px 0px 0px 0px;
+}
+.custom-menu, .custom-menu-user {
+	display: none;
+	z-index: 10000;
+	position: absolute;
+}
+.custom-menu li, .custom-menu-user li {
+	cursor: pointer;
+}
+.custom-menu li:hover, .custom-menu-user li:hover {
+	background-color: #DEF;
+}
+#notificationCenterModalBody {
+	overflow-y: scroll;
+}
+.alert-default {
+	color: #333;
+	background-color: #FFF;
+	border-color: #DDD;
+}
+#suggestions {
+	position: absolute;
+	top: 50px;
+	width:300px;
+	display:none;
+	background-color: rgba(0,0,0,0.7);
+	-webkit-border-bottom-right-radius: 6px;
+	-webkit-border-bottom-left-radius: 6px;
+	-moz-border-radius-bottomright: 6px;
+	-moz-border-radius-bottomleft: 6px;
+	border-bottom-right-radius: 6px;
+	border-bottom-left-radius: 6px;
+}
+#suggestions .list-group-item {
+	color: #FFF;
+	background-color: rgba(0,0,0,0.2);
+	border: none;
+}
+#suggestions .list-group-item:hover {
+	color: #FFF;
+	background-color: rgba(255,255,255,0.2);
+}
+#suggestions .glyphicon {
+	cursor: pointer;
+}
+#suggestions .glyphicon:hover {
+    color: #333;
+}
+#searchclear {
+    position: relative;
+	right: 25px;
+    top: 3px;
+    bottom: 0;
+    height: 14px;
+    margin: auto;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ccc;
+    opacity: 0;
+}
+#searchclear:hover {
+    color: #333;
+}
+.navbar-text a {
+	color: rgb(119,119,119);
+	text-decoration: underline;
+	cursor: pointer;
+}
+.navbar-text a:hover {
+	color: #FFF;
+	text-decoration: none;
+}
+#multipleNewUsersTable {
+	margin-top: 15px;
+}
+#multipleNewUsersTable .form-control {
+	border-color: #FFF;
+	box-shadow: none;
+}
+#multipleNewUsersTable .form-control.error {
+	border-color: rgb(169, 68, 66);
+}
+#multipleNewUsersTable .form-control:focus {
+    box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+    outline: 0 none;
+}
+#userInfoModal input.error, #userInfoModal input.error:focus {
+	border-color: rgb(169, 68, 66);
+}

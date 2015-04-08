@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource name="jdbc/portalTest2"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		username="USER_NAME_GOES_HERE" 
+		password="PASSWORD_GOES_HERE"
+		driverClassName="com.mysql.jdbc.Driver" 
+		url="jdbc:mysql://localhost/portal_test2"
+		maxActive="30" 
+		maxIdle="10"/>
+
+	<Resource name="jdbc/um2"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		username="USER_NAME_GOES_HERE" 
+		password="PASSWORD_GOES_HERE"
+		driverClassName="com.mysql.jdbc.Driver" 
+		url="jdbc:mysql://localhost/um2"
+		maxActive="30" 
+		maxIdle="10"/>
+		
+	<Resource name="jdbc/aggregate"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		username="USER_NAME_GOES_HERE" 
+		password="PASSWORD_GOES_HERE"
+		driverClassName="com.mysql.jdbc.Driver" 
+		url="jdbc:mysql://localhost/aggregate"
+		maxActive="30" 
+		maxIdle="10"/>
+</Context>
