@@ -38,7 +38,7 @@ public class AddNewUserToTheGroup extends HttpServlet {
 			return;
 		}
 		
-		String group_mnemonic = request.getParameter("g_m");
+		String group_mnemonic = request.getParameter("g_m");//this is group title
 		String name = request.getParameter("u_n");
 		String email = request.getParameter("u_e");
 		String login = request.getParameter("u_l");
@@ -50,15 +50,16 @@ public class AddNewUserToTheGroup extends HttpServlet {
 		String country = request.getParameter("u_country");
 		country = country == null ? "" : country;
 		String teacher = "0";
-		String teacherTemp = request.getParameter("u_t");
-		if (userBean.isAdmin() && teacherTemp != null && teacherTemp.equals("1")) {
-			teacher = "1";
-		}
+		String role = request.getParameter("u_r");
+		
 		
 		DbPersistor persistorPT2 = new DbPersistor("PortalTest2");
 		ResultSet setPT2 = null;
 		DbPersistor persistorUM2 = new DbPersistor("UM2");
 		ResultSet setUM2 = null;
+		DbPersistor persistorAgg = new DbPersistor("aggregate");
+		ResultSet setAgg = null;
+		
         try {
         	PrintWriter out = response.getWriter();
         	JSONObject jsonResponse = new JSONObject();
@@ -89,11 +90,19 @@ public class AddNewUserToTheGroup extends HttpServlet {
     		attr.put(1, login);
     		attr.put(2, email);
     		
+    		
+    		
         	setPT2 = persistorPT2.persistData(DbPersistor.GET_USER_BY_LOGIN_OR_EMAIL, attr);
 
         	setUM2 = persistorUM2.persistData(DbPersistor.GET_USER_BY_LOGIN_OR_EMAIL, attr);
+        	
+        	attr = new HashMap<Integer, String>();
+        	attr.put(1, group_mnemonic);
+        	attr.put(2, login);
+        	
+        	setAgg = persistorAgg.persistData(DbPersistor.GET_ROLE_OF_USER, attr);
     		
-    		if(setPT2.next() && setUM2.next()) {
+    		if(setPT2.next() && setUM2.next()&&setAgg.next()) {
     			JSONObject userJson = new JSONObject();
     			userJson.put("id", setPT2.getString("UserID"));
     			userJson.put("login", setPT2.getString("Login"));
@@ -119,12 +128,23 @@ public class AddNewUserToTheGroup extends HttpServlet {
     			// end of -- UM2
     			attr.put(8, teacher);
     			Integer insertID1 = persistorPT2.persistUpdateGetID(DbPersistor.ADD_NEW_USER, attr);
-    			if (insertID1 != null && insertID2 != null) {
+    			
+    			//should also add data to aggregate.ent_non_student
+    			attr = new HashMap<Integer, String>();
+    			attr.put(1, login);
+    			attr.put(2, group_mnemonic);
+    			attr.put(3, role);
+    			Integer insertID3 = persistorAgg.persistUpdateGetID(DbPersistor.ADD_USER_TO_NON_STUDENT, attr);
+    			
+    			
+    			
+    			if (insertID1 != null && insertID2 != null&&insertID3!=null) {
     				JSONObject userJson = new JSONObject();
         			userJson.put("id", insertID1.toString());
         			userJson.put("login", login);
         			userJson.put("name", name);
         			userJson.put("email", email);
+        			userJson.put("role", role);
     				jsonResponse.put("success", "<span style=\"font-weight: bold;\">"+name+" ("+login+")</span> successfully added to the system");    	
     				jsonResponse.put("user", userJson);
     				userBean.addNotification("<span style=\"font-weight: bold;\">"+name+" ("+login+")</span> successfully added to the system", "success");
@@ -147,6 +167,7 @@ public class AddNewUserToTheGroup extends HttpServlet {
         } finally {
         	persistorPT2.close();
         	persistorUM2.close();
+        	persistorAgg.close();
         }
 	}
 

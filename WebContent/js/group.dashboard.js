@@ -52,8 +52,12 @@ function updateGroupSubFunction(jsonData, callback) {
 function updateGroup (groupID) {
 	$.post("getgroup", {g_id: groupID}, function() {}).done(function(data) {
 		var dataTemp = $.parseJSON(data);
-
+		
+		
+		
 		updateGroupSubFunction(dataTemp, function() {
+			var groupId = dataTemp['login'];
+			$('#groupIdz').html('Group ID: '+'<b>'+groupId+'</b>');
 			var obj = dataTemp['users'];
 			var tableHeight = ($('.sidebar').outerHeight() - 315)+'px';
 			var table = $('#groupTable').DataTable( {
@@ -66,13 +70,15 @@ function updateGroup (groupID) {
 				              { "mDataProp": "id" },
 				              { "mDataProp": "name" },
 				              { "mDataProp": "login" },
-				              { "mDataProp": "email" }
+				              { "mDataProp": "email" },
+				              { "mDataProp": "role"}
 				              ],
 				"aoColumnDefs": [
 				                 { "sTitle": "ID", "aTargets": [0] },
 				                 { "sTitle": "Name", "aTargets": [1] },
 				                 { "sTitle": "Login", "aTargets": [2] },
-				                 { "sTitle": "Email", "aTargets": [3] }
+				                 { "sTitle": "Email", "aTargets": [3] },
+				                 { "sTitle": "Role", "aTargets": [4] }
 				                 ]
 			});
 			$('#groupTable tbody').on( 'click', 'tr', function () {
@@ -177,7 +183,7 @@ function updateGroupCourses (groupID) {
 				var groupCourses = dataTemp['groupcourses'];
 				for (var i = 0; i < groupCourses.length; i++) {
 					var obj = groupCourses[i];
-					$('#groupCourses').append('<li class="list-group-item" courseid="'+obj['id']+'">'+obj['title']+'</li>');
+					$('#groupCourses').append('<li class="list-group-item" courseid="'+obj['id']+'">'+obj['title']+'<b>['+obj['id']+']</b>'+'</li>');
 				}
 				$('#addGroupCoursePlusBtn').addClass('hidden');
 			} else {
@@ -285,7 +291,7 @@ function updateUsers () {
 				var email = rowChildren.eq(3).html();
 				$('.custom-menu-user li[data-action="add"]').unbind('click').click({param1: id, param2: name, param3: login, param4: email}, function(params){
 					$(".custom-menu-user").hide(100);
-					addUserToGroup(params.data.param1, params.data.param2, params.data.param3, params.data.param4);
+					addUserToGroup(params.data.param1, params.data.param2, params.data.param3, params.data.param4, "student");
 				});
 				return false;
 			});
@@ -325,6 +331,7 @@ $(document).ready(function() {
 	$('#groupSelector').on('change', function(){
 		if ($('#groupSelector').val() != '-1') {
 			updateGroup($('#groupSelector').val());
+			
 			updateGroupApps($('#groupSelector').val());
 			updateGroupCourses($('#groupSelector').val());
 		} else {
@@ -505,7 +512,7 @@ function toggleDeleteConfirmation() {
 /**
  * Add Single User to the Group functions
  */
-function addUserToGroup(rID, rName, rLogin, rEmail) {
+function addUserToGroup(rID, rName, rLogin, rEmail, rRole) {
 	var groupMnemonic = $('#groupTitle').attr('mnemonic');
 	$.post("addexistingusertothegroup", {g_m: groupMnemonic, u_l: rLogin}, function() {}).done(function(data) {
 		var dataTemp = $.parseJSON(data);
@@ -513,7 +520,8 @@ function addUserToGroup(rID, rName, rLogin, rEmail) {
 			notifyError(dataTemp['error']);
 		} else if ('success' in dataTemp) {
 			notifySuccess(dataTemp['success']);
-			$('#groupTable').dataTable().fnAddData( {"id" : ""+rID+"", "name" : ""+rName+"", "login" : ""+rLogin+"", "email" : ""+rEmail+""});
+			//alert(rRole);
+			$('#groupTable').dataTable().fnAddData( {"id" : ""+rID+"", "name" : ""+rName+"", "login" : ""+rLogin+"", "email" : ""+rEmail+"", "role" : ""+rRole+""});
 			addContextMenuToGroupTable();
 		} else if ('notice' in dataTemp) {
 			notifyDefault(dataTemp['notice']);
@@ -565,7 +573,7 @@ function addMultipleUsersToGroup(usersJson) {
 				{
 				     var text = successObj[i].success;
 				     notificationCenterAddRecord(text, 'success');
-				     $('#groupTable').dataTable().fnAddData( {"id" : ""+successObj[i].userID+"", "name" : ""+successObj[i].userName+"", "login" : ""+successObj[i].userLogin+"", "email" : ""+successObj[i].userEmail+""});
+				     $('#groupTable').dataTable().fnAddData( {"id" : ""+successObj[i].userID+"", "name" : ""+successObj[i].userName+"", "login" : ""+successObj[i].userLogin+"", "email" : ""+successObj[i].userEmail+"", "role": "student"});
 				     addCount++;				     
 				}
 				if (addCount > 0) {
@@ -653,6 +661,8 @@ function addContextMenuToGroupTable() {
 		var id = rowChildren.eq(0).html();
 		var name = rowChildren.eq(1).html();
 		var login = rowChildren.eq(2).html();
+		var role = rowChildren.eq(4).html();
+		
 		$('.custom-menu li[data-action="delete"]').unbind('click').click({param1: id, param2: name, param3: login}, function(params){
 			$(".custom-menu").hide();
 			if (showDeleteConfirmationDialogFlag) {
@@ -664,11 +674,15 @@ function addContextMenuToGroupTable() {
 		$('.custom-menu li[data-action="info"]').unbind('click').click({param1: login}, function(params){
 			$(".custom-menu").hide();
 			openUserInfoModal(params.data.param1, userInfoStaticMode);
+			$('#userEditRoleStatic').html(role);
+			
 		});
 		if ($('.custom-menu li[data-action="edit"]').length) {
 			$('.custom-menu li[data-action="edit"]').unbind('click').click({param1: login}, function(params){
 				$(".custom-menu").hide();
 				openUserInfoModal(params.data.param1, userInfoEditMode);
+				//alert(role);
+				$('#userEditRole input:radio[value="'+role+'"]').prop('checked',true);
 			});			
 		}
 		return false;
@@ -790,6 +804,8 @@ function userInfoStaticMode() {
 	$('#userEditCity').hide();
 	$('#userEditCountryStatic').show();
 	$('#userEditCountry').hide();
+	$('#userEditRoleStatic').show();
+	$('#userEditRole').hide();
 	if ($('#userInfoEditButton').length) {
 		$('#userInfoEditButton').show();
 	}
@@ -808,6 +824,9 @@ function userInfoEditMode() {
 	$('#userEditCity').slideDown('slow');
 	$('#userEditCountryStatic').slideUp('slow');
 	$('#userEditCountry').slideDown('slow');
+	$('#userEditRoleStatic').slideUp('slow');
+	$('#userEditRole').slideDown('slow');
+	
 	if ($('#userInfoEditButton').length) {
 		$('#userInfoEditButton').hide();
 	}
@@ -848,13 +867,16 @@ function saveUserEditUpdates () {
 	var organization = $('#userEditOrganization').val();
 	var city = $('#userEditCity').val();
 	var country = $('#userEditCountry').val();	
+	var role = $("input[name='radioGroup']:checked", "#userInfoModalModalBody").val();
+	var groupid = $('#groupIdz b').html();
+	
 	var teacher = '0';
 	if ($('#userEditTeacher').length) {
 		if ($('#userEditTeacher').prop("checked")) {
 			teacher = '1';					
 		}
 	}
-	$.post("updateuserinfo", {u_n: name, u_e: email, u_l: login, u_o: organization, u_c: city, u_country: country, u_t: teacher}, function() {}).done(function(data) {
+	$.post("updateuserinfo", {u_n: name, u_e: email, u_l: login, u_o: organization, u_c: city, u_country: country, u_r: role, u_gi: groupid}, function() {}).done(function(data) {
 		var dataTemp = $.parseJSON(data);
 		if ('error' in dataTemp) {
 			notifyError(dataTemp['error']);
@@ -866,12 +888,15 @@ function saveUserEditUpdates () {
 				name = dataTemp['user'].name;
 				login = dataTemp['user'].login;
 				email = dataTemp['user'].email;
+				role = dataTemp['role'];
 				$('#groupTable tbody tr').each(function() {
 					var rowChildrenTds = $(this).children('td');
 					if (rowChildrenTds.eq(2).html() == login) {				
 						rowChildrenTds.eq(0).html(id); 
 						rowChildrenTds.eq(1).html(name); 
 						rowChildrenTds.eq(3).html(email); 
+						rowChildrenTds.eq(4).html(role);
+						
 						var table = $('#groupTable').DataTable();
 						table.draw();
 					}
@@ -935,7 +960,9 @@ function addNewUser () {
 	city = city == null ? '' : city;
 	var country = $('#userAddCountry').val().trim();
 	country = country == null ? '' : country;
-	var teacher = '0';
+	var role = $("input[name='radioGroup']:checked", "#addNewSingleUserModal").val();
+	
+	
 	if (name.length == 0 || name.length > 60) {
 		errorMessage = "Name has to be 1 to 60 characters long";
 	}
@@ -952,11 +979,11 @@ function addNewUser () {
 		errorMessage = errorMessage.length > 0 ? errorMessage+"<br/>" : errorMessage;
 		errorMessage += "Password has to be 1 to 60 characters long";
 	}
-	if ($('#userAddTeacher').length) {
-		if ($('#userAddTeacher').prop("checked")) {
-			teacher = '1';					
-		}
-	}
+//	if ($('#userAddTeacher').length) {
+//		if ($('#userAddTeacher').prop("checked")) {
+//			teacher = '1';					
+//		}
+//	}
 	if (errorMessage.length > 0) {
 		$("#addNewSingleUserErrorBox").hide().html('<div class="alert alert-danger alert-dismissible" role="alert">'+
 				'<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>'+
@@ -964,7 +991,7 @@ function addNewUser () {
 	} else {
 		var groupMnemonic = $('#groupTitle').attr('mnemonic');
 		$('#addNewSingleUserModal').modal('hide');
-		$.post("addnewusertothegroup", {g_m: groupMnemonic, u_n: name, u_e: email, u_l: login, u_p: password, u_o: organization, u_c: city, u_country: country, u_t: teacher}, function() {}).done(function(data) {
+		$.post("addnewusertothegroup", {g_m: groupMnemonic, u_n: name, u_e: email, u_l: login, u_p: password, u_o: organization, u_c: city, u_country: country, u_r: role}, function() {}).done(function(data) {
 			var dataTemp = $.parseJSON(data);
 			if ('error' in dataTemp) {
 				notifyError(dataTemp['error']);
@@ -975,7 +1002,7 @@ function addNewUser () {
 					notifyDefault(dataTemp['warning']);					
 				}
 				var userObj = dataTemp['user'];
-				addUserToGroup(userObj['id'], userObj['name'], userObj['login'], userObj['email']);
+				addUserToGroup(userObj['id'], userObj['name'], userObj['login'], userObj['email'], userObj['role']);//changed
 				$('#userAddName').val('');
 				$('#userAddEmail').val('');
 				$('#userAddLogin').val('');

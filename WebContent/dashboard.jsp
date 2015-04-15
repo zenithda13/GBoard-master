@@ -64,10 +64,10 @@
 			<div class="row">
 				<div class="col-sm-3 col-md-2 sidebar">
 					<button class="btn btn-default btn-lg btn-group-add" onclick="openAddGroupModal();" title="add new group"><span class="glyphicon glyphicon-plus-sign"></span></button>
-					<h3 class="sub-header">Group</h3>
+					<h3 class="sub-header" style="margin-top: 0px;">Group</h3>
 					<select id="groupSelector" data-live-search="true">
 						<option value="-1">select group</option>
-					</select><br/><br/>
+					</select><br/><div id="groupIdz"></div>
 					<button class="btn btn-default btn-lg btn-app-confirm hidden" onclick="updateGroupAppsOKBtnClick();" title="update group apps" id="updateGroupAppsOKBtn"><span class="glyphicon glyphicon-ok-sign"></span></button>
 					<h4 class="sub-header">Apps</h4>
 					<ul class="list-group" id="groupApps">
@@ -300,11 +300,29 @@
 			      <input type="text" class="form-control" id="userEditCountry" name="country" />
 			    </div>
 			  </div>
-<%
+			  <div class="form-group">
+			  	<label class="col-sm-3 control-label">Role</label>
+			  	  <p class="form-control-static" id="userEditRoleStatic"></p>
+				  <div id="userEditRole" class="col-sm-offset-3 col-sm-8">
+				  	<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio1" value="student" checked="checked"> Student
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio2" value="instructor"> Instructor
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio3" value="researcher"> Researcher
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio3" value="ta"> TA
+	        		</label>
+				  </div>
+			  </div>
+<%-- <%
 	if (userBean.getRole().equals("admin")) {
 		out.println("<div class=\"form-group\"><div class=\"col-sm-offset-3 col-sm-9\"><div class=\"checkbox\"><label><input type=\"checkbox\" id=\"userEditTeacher\" value=\"true\"> Teacher</label></div></div></div>");
 	}
-%>
+%> --%>
 			</div>
 	      </div>
 	      <div class="modal-footer">
@@ -370,11 +388,28 @@
 			      <input type="text" class="form-control" id="userAddCountry" name="country" />
 			    </div>
 			  </div>
-<%
+			  <div class="form-group">
+				  <div class="col-sm-offset-3 col-sm-8">
+				  	<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio1" value="student" checked="checked"> Student
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio2" value="instructor"> Instructor
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio3" value="researcher"> Researcher
+	        		</label>
+	        		<label class="radio-inline">
+	          			<input type="radio" name="radioGroup" id="radio3" value="ta"> TA
+	        		</label>
+				  </div>
+			  </div>
+			  
+<%-- <%
 	if (userBean.getRole().equals("admin")) {
 		out.println("<div class=\"form-group\"><div class=\"col-sm-offset-3 col-sm-9\"><div class=\"checkbox\"><label><input type=\"checkbox\" id=\"userAddTeacher\" value=\"true\"> Teacher</label></div></div></div>");
 	}
-%>
+%> --%>
 			</div>
 	      </div>
 	      <div class="modal-footer">

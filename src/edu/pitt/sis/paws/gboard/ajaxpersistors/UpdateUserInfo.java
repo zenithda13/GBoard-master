@@ -47,19 +47,25 @@ public class UpdateUserInfo extends HttpServlet {
 		city = city == null ? "" : city;
 		String country = request.getParameter("u_country");
 		country = country == null ? "" : country;
-		String teacher = request.getParameter("u_t");
+		String role = request.getParameter("u_r");
+		String groupid = request.getParameter("u_gi");
+		String teacher = "0";
+		
 		
 		DbPersistor persistorPT2 = new DbPersistor("PortalTest2");
 		ResultSet setPT2 = null;
 		DbPersistor persistorUM2 = new DbPersistor("UM2");
 		ResultSet setUM2 = null;
+		DbPersistor persistorAgg = new DbPersistor("aggregate");
+		ResultSet setAgg = null;
+		
         try {
         	PrintWriter out = response.getWriter();
         	JSONObject jsonResponse = new JSONObject();
         	HashMap<Integer, String> attr = new HashMap<Integer, String>();
         	
         	if(!userBean.isAdmin() || name == null || name.length() == 0 || email == null || email.length() == 0 || 
-        			login == null || login.length() == 0 || teacher == null || (!teacher.equals("0") && !teacher.equals("1"))) {
+        			login == null || login.length() == 0 || role.length()==0|| role==null) {
         		jsonResponse.put("error", "ERROR! Wrong parameters");
     			out.println(jsonResponse.toString());
     			userBean.addNotification("ERROR! Wrong parameters", "danger");
@@ -120,6 +126,40 @@ public class UpdateUserInfo extends HttpServlet {
     			jsonResponse.put("error", "Specified user wasn't found");
     			userBean.addNotification("Specified user wasn't found", "danger");
     		}
+    		
+    		//handle the role part
+    		attr = new HashMap<Integer, String>();
+    		attr.put(1, groupid);
+    		attr.put(2, login);
+    		setAgg = persistorAgg.persistData(DbPersistor.GET_ROLE_OF_USER, attr);
+    		
+    		if (setAgg.next()) {//already in aggregate.ent_non_student
+    			//System.out.println("already in that");
+    			//System.out.println(role);
+				if (role.equalsIgnoreCase("student")) {//delete
+					boolean update3 = persistorAgg.persistUpdate(DbPersistor.DELETE_FROM_NONUSER, attr);
+					//System.out.println("delete");
+				}else {//not student, update
+					attr = new HashMap<Integer, String>();
+					attr.put(1, role);
+					attr.put(2, groupid);
+					attr.put(3, login);
+					boolean update4 = persistorAgg.persistUpdate(DbPersistor.UPDATE_FROM_NONUSER, attr);
+				}
+			}else {//not in aggreate.ent_non_student
+				if (role!="student") {//insert
+					attr = new HashMap<Integer, String>();
+					attr.put(1, login);
+					attr.put(2, groupid);
+					attr.put(3, role);
+					boolean update5 = persistorAgg.persistUpdate(DbPersistor.ADD_USER_TO_NON_STUDENT, attr);
+				}else {//do nothing because it is student
+					
+				}
+			}
+    		
+    		
+    		jsonResponse.put("role", role);
 			out.println(jsonResponse.toString());
         } catch (Exception e) {
             e.printStackTrace();

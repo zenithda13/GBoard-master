@@ -45,6 +45,13 @@ public class DbPersistor {
 	public static final String GET_ALL_COURSES = "SELECT * FROM ent_course ORDER BY course_name ASC;";
 	public static final String ADD_COURSE_TO_THE_GROUP = "INSERT INTO ent_group (group_id, group_name, course_id, creation_date, term, year) VALUES (?, ?, ?, NOW(), ?, ?);";
 	
+	//For user ROLE
+	public static final String GET_ROLE_OF_USER = "SELECT user_role FROM ent_non_student WHERE group_id = ? AND user_id = ?;";
+	public static final String ADD_USER_TO_NON_STUDENT = "INSERT INTO ent_non_student values(null,?,?,?);";
+	
+	public static final String DELETE_FROM_NONUSER = "DELETE FROM ent_non_student WHERE group_id=? AND user_id=?;";
+	public static final String UPDATE_FROM_NONUSER = "UPDATE ent_non_student SET user_role=? WHERE group_id=? AND user_id=?;";
+	
 	
 	private DbConnection connection = null;
 	

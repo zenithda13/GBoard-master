@@ -145,3 +145,6 @@
 #userInfoModal input.error, #userInfoModal input.error:focus {
 	border-color: rgb(169, 68, 66);
 }
+#groupIdz{
+	font-size: 10px;
+}

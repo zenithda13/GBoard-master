@@ -41,17 +41,25 @@ public class GetGroup extends HttpServlet {
 		
 		String groupID = request.getParameter("g_id");
 		DbPersistor persistor = new DbPersistor("PortalTest2");
+		DbPersistor persistorAgg = new DbPersistor("aggregate");
+		
 		ResultSet set = null;
+		ResultSet set2 = null;//new
         try {
         	PrintWriter out = response.getWriter();
         	HashMap<Integer, String> attr = new HashMap<Integer, String>();
+        	HashMap<Integer, String> attr2 = new HashMap<Integer, String>();//new
+        	
         	attr.put(1, groupID);
         	
         	set = persistor.persistData(DbPersistor.GET_GROUP_BY_ID, attr);
         	set.next();
         	JSONObject group = new JSONObject();
         	group.put("id", set.getString("u.UserID"));
-        	group.put("login", set.getString("u.Login"));
+        	group.put("login", set.getString("u.Login"));//Group ID
+        	
+        	attr2.put(1, set.getString("u.Login"));//new
+        	
         	group.put("name", set.getString("u.Name"));
     		
         	set = persistor.persistData(DbPersistor.GET_GROUP_USERS, attr);
@@ -60,7 +68,17 @@ public class GetGroup extends HttpServlet {
         	while (set.next()) {
         		JSONObject user = new JSONObject();
         		user.put("id", set.getString("u.UserID"));
-        		user.put("login", set.getString("u.Login"));
+        		user.put("login", set.getString("u.Login"));//User_id
+        		//get the role of user
+        		attr2.put(2, set.getString("u.Login"));//new
+        		set2 = persistorAgg.persistData(DbPersistor.GET_ROLE_OF_USER, attr2);
+        		if (set2.next()) {
+					user.put("role", set2.getString("user_role"));
+				}else {
+					user.put("role", "student");
+				}
+        		
+        		
         		user.put("name", set.getString("u.Name"));
         		user.put("email", set.getString("u.EMail"));
         		users.put(user);
@@ -78,6 +96,7 @@ public class GetGroup extends HttpServlet {
             } catch (Exception e2) {}
         } finally {
         	persistor.close();
+        	persistorAgg.close();
         }
 	}
 
