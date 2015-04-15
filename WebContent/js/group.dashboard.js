@@ -185,18 +185,24 @@ function updateGroupCourses (groupID) {
 					var obj = groupCourses[i];
 					$('#groupCourses').append('<li class="list-group-item" courseid="'+obj['id']+'">'+obj['title']+'<b>['+obj['id']+']</b>'+'</li>');
 				}
-				$('#addGroupCoursePlusBtn').addClass('hidden');
+				$('#addGroupCoursePlusBtn').removeClass('hidden');
+				$('#addGroupCoursePlusBtn span').removeClass('glyphicon glyphicon-plus-sign').addClass('glyphicon glyphicon-pencil');
+				$('#addCourseModal .modal-title').html('Edit Course For The Group');
+				$('#addCourseModal .modal-footer').children().eq(0).html('Edit');
 			} else {
 				$('#groupCourses').html('None');
 				$('#groupCourses').height('30');
+				$('#addGroupCoursePlusBtn span').removeClass('glyphicon glyphicon-pencil').addClass('glyphicon glyphicon-plus-sign');
 				$('#addGroupCoursePlusBtn').removeClass('hidden');
+				$('#addCourseModal .modal-title').html('Add Course To The Group');
+				$('#addCourseModal .modal-footer').children().eq(0).html('Add');
 			}
 			if ('courses' in dataTemp) {
 				$('#addCourseCourseField').html('');
 				var courses = dataTemp['courses'];
 				for (var i = 0; i < courses.length; i++) {
 					var obj = courses[i];
-					$('#addCourseCourseField').append('<option value="'+obj['id']+'">'+obj['name']+'</option>');
+					$('#addCourseCourseField').append('<option value="'+obj['id']+'">'+obj['name']+' {'+obj['id']+'}</option>');
 				}			
 			}			
 		}
@@ -466,6 +472,7 @@ function removeUserToolbarClick () {
 		var id = rowChildren.eq(0).html();
 		var name = rowChildren.eq(1).html();
 		var login = rowChildren.eq(2).html();
+		
 		if (showDeleteConfirmationDialogFlag) {
 			removeUserConfirmation(id, name, login);
 		} else {

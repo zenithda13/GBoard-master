@@ -2,6 +2,7 @@ package edu.pitt.sis.paws.gboard.ajaxpersistors;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -42,8 +43,12 @@ public class AddCourseToTheGroup extends HttpServlet {
 		String term = request.getParameter("term");
 		String year = request.getParameter("year");
 		String courseID = request.getParameter("c_id");
+		
+		HashMap<Integer, String> attr = new HashMap<Integer, String>();
 
 		DbPersistor persistorAggregate = new DbPersistor("Aggregate");
+		ResultSet setAgg = null;
+		
         try {
         	PrintWriter out = response.getWriter();
         	JSONObject jsonResponse = new JSONObject();
@@ -54,22 +59,32 @@ public class AddCourseToTheGroup extends HttpServlet {
     			userBean.addNotification("ERROR! Wrong parameters", "danger");
     			return;
     		}
-        	
-        	HashMap<Integer, String> attr = new HashMap<Integer, String>();
+        	//test whether there is course in this group now
         	attr.put(1, groupMnemonic);
-        	attr.put(2, groupName);
-        	attr.put(3, courseID);
-        	attr.put(4, term);
-        	attr.put(5, year);
-        	
-        	if (persistorAggregate.persistUpdate(DbPersistor.ADD_COURSE_TO_THE_GROUP, attr)) {
-        		jsonResponse.put("success", "<span style=\"font-weight: bold;\">"+groupName+"</span> group course has been updated");    			
-    			userBean.addNotification("<span style=\"font-weight: bold;\">"+groupName+"</span> group course has been updated", "success");
-    		} else {
-    			jsonResponse.put("error", "ERROR! SQL exception occurred while updating <span style=\"font-weight: bold;\">"+groupName+"</span> group course");    			
-    			userBean.addNotification("ERROR! SQL exception occurred while updating <span style=\"font-weight: bold;\">"+groupName+"</span> group course", "danger");
-    		}
-        	
+        	setAgg = persistorAggregate.persistData(DbPersistor.FIND_GROUP_COURSE, attr);
+        	if (setAgg.next()) {//has already in aggregate.ent_group
+				attr = new HashMap<Integer, String>();
+				attr.put(1, courseID);
+				attr.put(2, term);
+				attr.put(3, year);
+				attr.put(4, groupMnemonic);
+				persistorAggregate.persistUpdate(DbPersistor.UPDATE_GROUP_COURSE, attr);
+			}else{//not in aggregate.ent_group
+	        	attr = new HashMap<Integer, String>();
+	        	attr.put(1, groupMnemonic);
+	        	attr.put(2, groupName);
+	        	attr.put(3, courseID);
+	        	attr.put(4, term);
+	        	attr.put(5, year);
+	        	
+	        	if (persistorAggregate.persistUpdate(DbPersistor.ADD_COURSE_TO_THE_GROUP, attr)) {
+	        		jsonResponse.put("success", "<span style=\"font-weight: bold;\">"+groupName+"</span> group course has been updated");    			
+	    			userBean.addNotification("<span style=\"font-weight: bold;\">"+groupName+"</span> group course has been updated", "success");
+	    		} else {
+	    			jsonResponse.put("error", "ERROR! SQL exception occurred while updating <span style=\"font-weight: bold;\">"+groupName+"</span> group course");    			
+	    			userBean.addNotification("ERROR! SQL exception occurred while updating <span style=\"font-weight: bold;\">"+groupName+"</span> group course", "danger");
+	    		}
+			}
         	out.println(jsonResponse.toString());
         	out.close();
         } catch (Exception e) {

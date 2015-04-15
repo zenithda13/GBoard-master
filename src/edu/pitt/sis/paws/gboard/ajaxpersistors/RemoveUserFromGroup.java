@@ -62,6 +62,9 @@ public class RemoveUserFromGroup extends HttpServlet {
 		ResultSet setPT2 = null;
 		DbPersistor persistorUM2 = new DbPersistor("UM2");
 		ResultSet setUM2 = null;
+		DbPersistor persistorAgg = new DbPersistor("aggregate");
+		ResultSet setAgg = null;
+		
         try {
         	PrintWriter out = response.getWriter();
         	JSONObject jsonResponse = new JSONObject();
@@ -151,6 +154,16 @@ public class RemoveUserFromGroup extends HttpServlet {
     		}
     		
 			out.println(jsonResponse.toString());
+			
+			//Aggregate
+			attr = new HashMap<Integer, String>();
+			attr.put(1, group_mnemonic);
+			attr.put(2, user_login);
+			setAgg = persistorAgg.persistData(DbPersistor.GET_ROLE_OF_USER, attr);
+			if (setAgg.next()) {
+				boolean flag = persistorAgg.persistUpdate(DbPersistor.DELETE_FROM_NONUSER, attr);
+			}
+			
         	
         } catch (Exception e) {
             e.printStackTrace();
